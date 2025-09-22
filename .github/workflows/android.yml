@@ -18,30 +18,29 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # ✅ Instala el ANDROID SDK + herramientas necesarias (API 35)
+      # ✅ Instala el Android SDK (API 35) para que Gradle encuentre el SDK
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
           api-level: 35
           build-tools: '35.0.0'
 
-      # Descarga Gradle y genera el wrapper (porque no lo tenemos en repo)
-      - name: Install Gradle and generate wrapper
+      # ✅ Descarga Gradle 8.7 y GENERA el wrapper en 8.7 (AGP 8.5.2 es compatible con 8.7)
+      - name: Install Gradle and generate wrapper (8.7)
         run: |
           curl -sLo gradle.zip https://services.gradle.org/distributions/gradle-8.7-bin.zip
           unzip -q gradle.zip -d $HOME/gradle
           echo "$HOME/gradle/gradle-8.7/bin" >> $GITHUB_PATH
           gradle -v
-          gradle wrapper
+          gradle wrapper --gradle-version 8.7
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # Compila APK debug
+      # ✅ Compila con el wrapper (8.7)
       - name: Build Debug APK
         run: ./gradlew clean assembleDebug --stacktrace --no-daemon
 
-      # Sube el APK como artefacto descargable
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
